@@ -6,6 +6,7 @@ defmodule GenRMQ.ConsumerTest do
 
   alias TestConsumer.Default
   alias TestConsumer.WithoutConcurrency
+  alias TestConsumer.WithoutReconnection
 
   @uri "amqp://guest:guest@localhost:5672"
   @exchange "gen_rmq_in_exchange"
@@ -64,6 +65,18 @@ defmodule GenRMQ.ConsumerTest do
 
       Assert.repeatedly(fn ->
         assert Agent.get(Default, fn set -> message in set end) == true
+      end)
+    end
+
+    test "should termiate after connection failure when reconnection disabled", context do
+      {:ok, consumer_pid} = GenRMQ.Consumer.start_link(WithoutReconnection, name: :consumer)
+
+      state = :sys.get_state(consumer_pid)
+      Process.exit(state.conn.pid, :kill)
+
+      Assert.repeatedly(fn ->
+        assert Process.alive?(consumer_pid) == false
+        assert Process.whereis(WithoutReconnection) == nil
       end)
     end
   end

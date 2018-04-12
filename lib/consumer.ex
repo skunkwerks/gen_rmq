@@ -200,15 +200,22 @@ defmodule GenRMQ.Consumer do
   end
 
   @doc false
-  def handle_info({:DOWN, _ref, :process, _pid, reason}, %{module: module} = state) do
+  def handle_info({:DOWN, _ref, :process, _pid, reason}, %{module: module, config: config, in: channel} = state) do
     Logger.info("[#{module}]: RabbitMQ connection is down! Reason: #{inspect(reason)}")
 
-    {:ok, new_state} =
-      state
-      |> Map.put(:reconnect_attempt, 0)
-      |> rabbitmq_connect()
+    case Keyword.get(config, :reconnect, true) do
+      true ->
+        {:ok, new_state} =
+          state
+          |> Map.put(:reconnect_attempt, 0)
+          |> rabbitmq_connect()
 
-    {:noreply, new_state}
+        {:noreply, new_state}
+
+      false ->
+        Logger.info("[#{module}]: Reconnection is disabled. Terminating consumer.")
+        {:stop, :normal, state}
+    end
   end
 
   @doc false
@@ -241,6 +248,11 @@ defmodule GenRMQ.Consumer do
     do_handle(payload, attributes, state, Keyword.get(config, :concurrency, true))
 
     {:noreply, state}
+  end
+
+  @doc false
+  def terminate(reason, %{module: module, in: channel}) do
+    Logger.debug("[#{module}]: Terminating error consumer: #{inspect(reason)}")
   end
 
   ##############################################################################
