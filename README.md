@@ -21,7 +21,7 @@ The project currently provides the following functionality:
 ## Installation
 ~~~elixir
 def deps do
-  [{:gen_rmq, "~> 0.1.7"}]
+  [{:gen_rmq, "~> 0.1.8"}]
 end
 ~~~
 
