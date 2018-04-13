@@ -251,8 +251,8 @@ defmodule GenRMQ.Consumer do
   end
 
   @doc false
-  def terminate(reason, %{module: module, in: channel}) do
-    Logger.debug("[#{module}]: Terminating error consumer: #{inspect(reason)}")
+  def terminate(reason, %{module: module}) do
+    Logger.debug("[#{module}]: Terminating consumer, reason: #{inspect(reason)}")
   end
 
   ##############################################################################

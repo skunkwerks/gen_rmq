@@ -60,8 +60,8 @@ defmodule TestConsumer do
 
     def init() do
       [
-        queue: "gen_rmq_in_queue",
-        exchange: "gen_rmq_exchange",
+        queue: "x_gen_rmq_in_queue",
+        exchange: "x_gen_rmq_in_exchange",
         routing_key: "no_messages",
         prefetch_count: "10",
         uri: "amqp://guest:guest@localhost:5672",

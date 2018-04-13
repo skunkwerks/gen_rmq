@@ -69,9 +69,10 @@ defmodule GenRMQ.ConsumerTest do
     end
 
     test "should termiate after connection failure when reconnection disabled", context do
-      {:ok, consumer_pid} = GenRMQ.Consumer.start_link(WithoutReconnection, name: :consumer)
+      {:ok, consumer_pid} = GenRMQ.Consumer.start_link(WithoutReconnection, name: :consumer_no_reconnection)
+      :timer.sleep(2000)
 
-      state = :sys.get_state(consumer_pid)
+      state = :sys.get_state(consumer_pid) |> IO.inspect()
       Process.exit(state.conn.pid, :kill)
 
       Assert.repeatedly(fn ->
